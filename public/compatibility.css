@@ -45,9 +45,6 @@
     .sectionHeading {
         max-height: 250px;
     }
-    /*.searchResultTable {
-        min-height: 20px;
-    }*/
     .mainHeading .table, .quickLogin{
         width: 100%;
         padding-left: 25%;

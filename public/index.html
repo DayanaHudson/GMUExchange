@@ -68,15 +68,6 @@
             var providerData = user.providerData;
             user.getToken().then(function(accessToken) {
                 document.getElementById('sign-in-status').textContent = "Welcome, " + displayName;
-                document.getElementById('account-details').textContent = JSON.stringify({
-                    displayName: displayName,
-                    email: email,
-                    emailVerified: emailVerified,
-                    photoURL: photoURL,
-                    uid: uid,
-                    accessToken: accessToken,
-                    providerData: providerData
-                }, null, '  ');
             });
         } else {
             console.log("Signed out");
@@ -319,7 +310,9 @@
         },
         mixins: [ReactFireMixin],
         componentWillMount: function () {
-            this.fireRef = firebase.database().ref('users').child(userName);
+            if(userName) {
+                this.fireRef = firebase.database().ref('users').child(userName);
+            }
         },
         handleChange: function () {
             this.props.onUserInput(
@@ -581,7 +574,7 @@
             var keyword = this.props.filterKeywordText;
             var className = this.props.filterClassText;
             var professor = this.props.filterProfessorText;
-            var price = parseFloat(this.props.filterPriceMax);
+            var price = parseInt(this.props.filterPriceMax);
             //var date = this.props.filterDate;
             this.props.items.forEach(function (item) {
                 var keywordRegex = new RegExp('');
@@ -664,7 +657,6 @@
                     this.refs.filterClassTextInput.value,
                     this.refs.filterProfessorTextInput.value,
                     this.refs.filterPriceMaxInput.value,
-                    this.refs.filterDateInput.value,
             );
         },
         /*
@@ -681,8 +673,7 @@
             var filtersCurrent = [{name: 'Keyword', value: this.props.filterKeywordText, active: true},
                 {name: 'Class', value: this.props.filterClassText, active: true},
                 {name: 'Professor', value: this.props.filterProfessorText, active: true},
-                {name: 'Max Price', value: '$' + this.props.filterPriceMax, active: true},
-                {name: 'Date', value: this.props.filterDate, active: true}];
+                {name: 'Max Price', value: '$' + this.props.filterPriceMax, active: true}];
             filtersCurrent.forEach(function (filter) {
                 if (filter.name == 'Max Price' || filter.name == 'Category' || (filter.active == true && filter.value != null && filter.value.length > 0)) {
                     filtersActive.push(
@@ -718,7 +709,6 @@
                                     <td>Class</td>
                                     <td>Professor</td>
                                     <td>Maximum Price</td>
-                                    <td>Posted Date</td>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -742,24 +732,15 @@
                                             id="professorSearchTermInput"
                                     /></td>
                                     <td><input
-                                            type="range"
-                                            min="0"
-                                            max="500"
+                                            className="input"
+                                            type="text"
+                                            placeholder="Enter maximum price"
                                             id="priceSearchTermInput"
                                             value={this.props.filterPriceMax}
                                             ref="filterPriceMaxInput"
                                             onChange={this.handleChange}
                                     />
-                                        <div id="maxPriceDisplay">${this.props.filterPriceMax}</div>
                                     </td>
-                                    <td><input
-                                            className="input"
-                                            type="text"
-                                            placeholder="Search term"
-                                            value={this.props.filterDate}
-                                            ref="filterDateInput"
-                                            onChange={this.handleChange}
-                                            id="dateSearchTermInput"/></td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -784,18 +765,16 @@
                 filterCategory: 'All',
                 filterClassText: '',
                 filterProfessorText: '',
-                filterPriceMax: 500,
-                filterDate: ''
+                filterPriceMax: '500',
             }
         },
-        handleUserInput: function (filterKeywordText, filterCategory, filterClassText, filterProfessorText, filterPriceMax, filterDate) {
+        handleUserInput: function (filterKeywordText, filterCategory, filterClassText, filterProfessorText, filterPriceMax) {
             this.setState({
                 filterKeywordText: filterKeywordText,
                 filterCategory: filterCategory,
                 filterClassText: filterClassText,
                 filterProfessorText: filterProfessorText,
                 filterPriceMax: filterPriceMax,
-                filterDate: filterDate
             });
         },
         render: function () {
@@ -807,7 +786,6 @@
                                 filterClassText={this.state.filterClassText}
                                 filterProfessorText={this.state.filterProfessorText}
                                 filterPriceMax={this.state.filterPriceMax}
-                                filterDate={this.state.filterDate}
                                 onUserInput={this.handleUserInput}
                         />
                         <SearchResultsTable
@@ -817,13 +795,13 @@
                                 filterClassText={this.state.filterClassText}
                                 filterProfessorText={this.state.filterProfessorText}
                                 filterPriceMax={this.state.filterPriceMax}
-                                filterDate={this.state.filterDate}
                                 onUserInput={this.handleUserInput}
                         />
                     </div>
             );
         }
     });
+
 
     //HOME PAGE ******************************************************************************************************
 
@@ -865,11 +843,11 @@
                     this.refs.menuSearchBoxFieldInput.value,
             );
         },
-        enter: function(event){
-            if(event.keyCode == 13){
-                this.updateSearchView();
-            }
-        },
+        /*enter: function(event){
+         if(event.keyCode == 13){
+         this.updateSearchView();
+         }
+         },*/
         updateHomeView: function () {
             this.props.updateHomeView(
                     "Home"
@@ -895,19 +873,22 @@
                     "Sign Up"
             );
         },
+        /*
+         <li className="left" id="menuSearchBox">
+         <input type="text" placeholder="Search by keyword"
+         id="menuSearchBoxField"
+         onChange={this.handleChange}
+         onKeyDown={this.enter}
+         ref="menuSearchBoxFieldInput"/>
+         </li>
+         * */
         render: function () {
             return (
                     <nav className="menu">
                         <ul>
                             <li className="left" id="homeLink" onClick={this.updateHomeView}>Home</li>
                             <li className="left" id="postLink" onClick={this.updatePostView}>Post Item</li>
-                            <li className="left" id="menuSearchBox">
-                                <input type="text" placeholder="Search by keyword"
-                                       id="menuSearchBoxField"
-                                       onChange={this.handleChange}
-                                       onKeyDown={this.enter}
-                                       ref="menuSearchBoxFieldInput"/>
-                            </li>
+
                             <li className="left" id="searchLink" onClick={this.updateSearchView}>Search</li>
                             <li className="rightMenuLinks" id="logInLink" onClick={this.updateLogInView}>Log In</li>
                             <li className="rightMenuLinks">
@@ -930,7 +911,6 @@
                         <p>Dayana Hudson</p>
                         <p>Ermal Dedej</p>
                         <p><a href="https://github.com/dayanahudson/GMUExchange/">GitHub</a></p>
-                        Debug: <span id="account-details" />
 
                     </footer>
             );
