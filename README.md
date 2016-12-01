@@ -24,3 +24,5 @@ The four scenarios we decided on were as follows:
    month to view the breakdown of posts by category.
 
 https://dayanahudson.github.io/GMUExchange/public/index.html
+Heroku:
+https://sheltered-journey-42475.herokuapp.com/
