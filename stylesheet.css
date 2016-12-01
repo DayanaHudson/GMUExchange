@@ -1,0 +1,223 @@
+/* The Stylesheet defines CSS styling for every page and item in the GMUExchange
+   website.*/
+
+/* Text styling*/
+p, h1, h2, h3, h4, h5, h6, li, .bottomColumns, .creds, .search, .body {
+    font-family: sans-serif;
+}
+a {
+    color:inherit;
+    text-decoration:none;
+}
+html {
+    min-height:100%;
+}
+body {
+    background-color: #f2f2f2;
+}
+content {
+    min-height: 100%;
+}
+input[type="password"], input[type="email"]{
+    font-size: 17px;
+    width: 80%;
+}
+input[type="text"]{
+    font-size: 17px;
+    width: 100%;
+}
+.features {
+    text-align: center;
+}
+
+.pageContent {
+    padding: 15px;
+}
+
+.center {
+    text-align: center;
+}
+
+.formTable {
+    padding: 10px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.formTable td{
+    text-align: left;
+}
+
+.creds{
+    position: relative;
+    padding: 15px;
+    display: block;
+    width: 90%;
+    text-align: left;
+}
+
+/*Menu styling*/
+.menu {
+    margin-top: -10px;
+    height: 60px;
+    padding: 1px;
+    background-color: green;
+    opacity: 0.9;
+}
+.menu li {
+    display: inline-block;
+    padding: 10px;
+    color: white;
+    float: right;
+}
+li.left {
+    float: left;
+}
+
+/*Log out styling*/
+#logOut{
+    display: inline-block;
+    visibility: hidden;
+    padding: 10px;
+    color: white;
+}
+#logOut:hover{
+    color: green;
+}
+.menu li:hover {
+    background-color: white;
+    color: green;
+}
+
+/*Main and Section heading styling*/
+.mainHeading, .sectionHeading {
+    max-width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+.mainHeading img, .sectionHeading img {
+    width: 100%;
+    max-height: 100%;
+    opacity: 0.45;
+    transition: 1s ease-in;
+}
+/*Main heading and Section heading image transformation*/
+.mainHeading img:hover, .sectionHeading img:hover {
+    transform: scale(1.1);
+}
+
+/*originally implemented for new item to be posted*/
+.newItem {
+    display: none;
+}
+
+.newItemForm {
+    width: 50%;
+    padding: 10px;
+}
+
+/*Title, Subtitle, and Home Page login styling*/
+.title, .subtitle, .quickLogin{
+    width: 100%;
+    text-align: center;
+    position:absolute;
+    z-index: 10;
+    color: black;
+}
+
+/*Input boxes*/
+.input {
+    padding: 5px;
+}
+
+/*Home Page - Button styling*/
+.button {
+    background-color: green;
+    width: 100%;
+    height: 40px;
+    color: white;
+    text-align: center;
+    border: none;
+    font-size: 20px;
+}
+.creds .button {
+    margin: auto 50%;
+}
+
+.tableButton {
+    width: 200px;
+}
+
+.button:active {
+    border: none;
+    background-color: white;
+    color: green;
+}
+
+/*Home Page - Bottom columns*/
+.bottomColumns {
+    width: 100%;
+    background-color: #f2f2f2;
+    padding-bottom: 15px;
+    color: #333333;
+    padding-top: 5px;
+}
+.bottomColumns .table, .bottomColumns .table .td{
+    padding-bottom: 15px;
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+/*Footer styling*/
+.footer {
+    width: 100%;
+    background-color: #333333;
+    text-align: center;
+    color: white;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+.footer a {
+    font-family: monospace;
+    font-size: 20px;
+}
+
+.firebaseui-idp-button {
+    direction: ltr;
+    font-weight: 500;
+    height: 40px;
+    max-width: 220px;
+    padding-left: 16px;
+    text-align: left;
+    width: 100%;
+}
+.mdl-button--raised {
+    background: rgba(158,158,158, 0.20);
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.2),0 1px 5px 0 rgba(0,0,0,0.12);
+}
+.mdl-button {
+    background: transparent;
+    border: none;
+    border-radius: 2px;
+    color: rgb(0,100,0);
+    position: relative;
+    height: 36px;
+    margin: 0;
+    min-width: 64px;
+    display: inline-block;
+    font-family: "Roboto","Helvetica","Arial",sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+    line-height: 1;
+    letter-spacing: 0;
+    overflow: hidden;
+    will-change: box-shadow;
+    transition: box-shadow 0.2s cubic-bezier(0.4, 0, 1, 1),background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    line-height: 36px;
+    vertical-align: middle;
+}

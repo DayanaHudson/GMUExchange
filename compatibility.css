@@ -1,0 +1,93 @@
+/*MOBILE AND PHABLETS*/
+@media screen { /*http://www.w3schools.com/cssref/css3_pr_mediaquery.asp http://mydevice.io/devices/*/
+    .mainHeading, .sectionHeading{
+        max-height: 150px;
+    }
+    .mainHeading .features h1 {
+        font-size: 25px;
+    }
+    .title {
+        top: 10%;
+        font-size: 30px;
+    }
+    .subtitle {
+        top: 40%;
+        font-size: 20px;
+    }
+    .quickLogin {
+        visibility: hidden;
+    }
+    .bottomColumns .table tr,td{ /*https://css-tricks.com/responsive-data-tables/*/
+        display: block;
+        text-align: left;
+    }
+}
+
+/*TABLET*/
+@media screen and (min-width: 480px){ /*max-height:800px http://www.w3schools.com/cssref/css3_pr_mediaquery.asp http://mydevice.io/devices/*/
+    .mainHeading, .sectionHeading {
+        max-height: 200px;
+    }
+    .title {
+        top: 10%;
+        font-size: 40px;
+    }
+    .subtitle {
+        top: 40%;
+        font-size: 30px;
+    }
+}
+/*COMPUTER: FRACTION OF A WINDOW*/
+@media screen and (min-width: 700px){
+    .mainHeading {
+        max-height: 390px;
+    }
+    .sectionHeading {
+        max-height: 250px;
+    }
+    .mainHeading .table, .quickLogin{
+        width: 100%;
+        padding-left: 25%;
+        padding-right: 25%;
+    }
+    .mainHeading .title {
+        top: 5%;
+        font-size: 50px;
+    }
+    .mainHeading .subtitle {
+        top: 25%;
+        font-size: 30px;
+    }
+    .quickLogin {
+        visibility: visible;
+        top: 55%;
+    }
+    .bottomColumns .table tr,td{
+        display: table-cell;
+        text-align: center;
+    }
+    #menuSearchBox{
+        width: 525px;
+    }
+}
+/*COMPUTER: FULL SCREEN*/
+@media screen and (min-width: 1400px) { /*http://www.w3schools.com/cssref/css3_pr_mediaquery.asp*/
+    .mainHeading .title {
+        top: 0%;
+        font-size: 60px;
+    }
+    #menuSearchBox{
+        width: 1550px;
+    }
+    .mainHeading .table, .quickLogin{
+        padding-left: 35%;
+        padding-right: 35%;
+    }
+    .mainHeading .subtitle {
+        top: 20%;
+        font-size: 40px;
+    }
+    .bottomColumns, .searchResultTable {
+        min-height: 290px;
+    }
+}

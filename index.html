@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title></title><!--title to be updated by each view-->
+
+    <!--React without addons: <script src="https://fb.me/react-15.0.0.js"></script>-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.2/react-with-addons.js"></script>
+    <script src="https://fb.me/react-dom-15.0.0.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/3.4.0/firebase.js"></script>
+    <!-- Firebase Auth -->
+    <script src="https://www.gstatic.com/firebasejs/ui/live/0.5/firebase-ui-auth.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/live/0.5/firebase-ui-auth.css" />
+    <!-- ReactFire -->
+    <script src="https://cdn.firebase.com/libs/reactfire/1.0.0/reactfire.min.js"></script>
+    <!--<script type = "text/javascript" src = "myjavascript.js"></script>-->
+
+    <script type = "text/javascript" src = "https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <!--D3JS-->
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+    <script src="dashBoard.js"></script>
+    <link href="stylesheet.css" rel="stylesheet">
+    <link href="search.css" rel="stylesheet">
+    <link href="compatibility.css" rel="stylesheet">
+    <link href="dashBoard.css" rel="stylesheet">
+</head>
+<body class = "body">
+<div id="mountNode">
+    <!--Contains the rest of the website-->
+</div>
+<script type="text/babel">
+
+    //FIREBASE *********************************************************************************************************
+    "use strict";
+    var config = {
+        apiKey: "AIzaSyD0i-jjYdLEq4iVrsnJ759fDWDO2t7Utao",
+        authDomain: "gmuexchange.firebaseapp.com",
+        databaseURL: "https://gmuexchange.firebaseio.com",
+        storageBucket: "gmuexchange.appspot.com",
+        messagingSenderId: "191322581126"
+    };
+    firebase.initializeApp(config);
+
+    var userName;
+    // Initialize the FirebaseUI Widget using Firebase.
+    var ui = new firebaseui.auth.AuthUI(firebase.auth());
+    var userC;
+    firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+            console.log("Signed in");
+
+            $("#firebaseui-auth-container").hide();
+            $("#signUpLink").hide();
+            $("#logInLink").hide();
+            // User is signed in.
+            userC=user;
+            var displayName = user.displayName;
+            var email = user.email;
+            var emailVerified = user.emailVerified;
+            var photoURL = user.photoURL;
+            var uid = user.uid;
+            userName = user.uid;
+            ReactDOM.render(
+                    <AppComponent />,
+                    document.getElementById('mountNode')
+            );
+            var providerData = user.providerData;
+            user.getToken().then(function(accessToken) {
+                document.getElementById('sign-in-status').textContent = "Welcome, " + displayName;
+            });
+        } else {
+            console.log("Signed out");
+            // User is signed out.
+            $("#header").hide();
+            $("#signUpLink").show();
+            $("#firebaseui-auth-container").show();
+            $("#logInLink").show();
+        }
+    }, function(error) {
+        console.log(error);
+    });
+
+    //LOG IN PAGE **********************************************************************************************
+
+    var LogInPage = React.createClass({
+        componentDidMount: function() {
+            console.log("We made the component!");
+            $("#header").hide();
+
+            var uiConfig = {
+                'signInSuccessUrl': '/', //URL that we get sent BACK to after logging in
+                'signInOptions': [
+                    // Leave the lines as is for the providers you want to offer your users.
+                    firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+//                    firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+//                    firebase.auth.TwitterAuthProvider.PROVIDER_ID,
+//                    firebase.auth.GithubAuthProvider.PROVIDER_ID,
+//                    firebase.auth.EmailAuthProvider.PROVIDER_ID
+                ],
+                // Terms of service url.
+                'tosUrl': '<your-tos-url>',
+            };
+            ui.start('#firebaseui-auth-container', uiConfig);
+            $("#sign-in-status").show();
+
+        },
+        render: function () {
+            return (
+                    <div>
+                        <div id="firebaseui-auth-container"></div>
+
+                        <form className="creds">
+                            <table className="formTable">
+                                <tbody>
+                                <tr>
+                                    <td>Email:</td>
+                                    <td>
+                                        <input className="input" type="text" id="email" placeholder="GMU e-mail"
+                                               pattern="[a-z0-9]*@(masonlive\\.)?gmu\\.edu"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Password:</td>
+                                    <td>
+                                        <input className="input" type="password" id="password" placeholder="Password"/>
+                                    </td>
+                                </tr>
+
+                                </tbody>
+
+                            </table>
+                            <button className="tableButton button" id="signUpButton">Log In</button>
+
+                        </form>
+                    </div>
+            );
+        }
+    });
+
+    //SIGN UP PAGE **********************************************************************************************
+
+    var SignUpPage = React.createClass({
+        mixins: [ReactFireMixin],
+        getInitialState: function () {
+            return {
+                email: '',
+                password: '',
+                fName: '',
+                lName: '',
+                matchPwd: '',
+                lengthPwd:'',
+                validateEmail:''
+            };
+            this.checkPassword = this.checkPassword.bind(this);
+
+        },
+        componentWillMount: function () {
+            this.fireRef = firebase.database().ref('users');
+        },
+
+        //on change
+        handleChange: function (event) {
+            if (this.refs.password.value !== this.refs.confirmPwd.value) {
+                console.log("Not valid");
+            } else {
+                console.log("valid");
+
+            }
+        },
+
+        // Checking if the user put the same password on both fields
+        checkPassword: function (event) {
+            if (this.refs.password.value !== this.refs.confirmPwd.value) {
+                this.setState({matchPwd: "Passwords don't match"});
+            } else {
+                this.setState({matchPwd: ""});
+            }
+        },
+        //Checking for the length of password
+        checkPwdLength:function (event) {
+            console.log(this.refs.password.length);
+            var passlength= this.refs.password.value;
+            if(passlength.length < 8){
+                this.setState({lengthPwd: "Your password must be at least 8 characters"});
+            }
+            else if(passlength.search(/[a-z]/i) < 0) {// check for lower case letters
+                this.setState({lengthPwd:"Your password must contain at least one letter."});
+            }
+            else if (passlength.search(/[0-9]/) < 0) {// checks for digits
+                this.setState({lengthPwd:"Your password must contain at least one digit."});
+            }
+            else if (passlength.search(/[A-Z]/) < 0) {// check for upper case letters
+                this.setState({lengthPwd:"Your password must contain at least one upper case letter."});
+            }
+            else if(passlength.search(/[#?!@$%^&*-]/)<0){ // checks for specials charceter
+                this.setState({lengthPwd:"Your password must contain at least one specail character #?!@$%^&*-."});
+
+            }
+            else{
+                this.setState({lengthPwd: "Valid Password"});
+            }
+
+        },
+        // checking if the email match the pattern
+        checkEmail: function (event) {
+            var valEmail=this.refs.email.value;
+            var regexEmail = new RegExp("[a-z0-9]*@(masonlive\\.)?gmu\\.edu");
+            if (regexEmail.test(valEmail)) {
+                console.log("Matching email");
+                this.setState({validateEmail: "Valid Email"});
+
+            } else {
+                console.log("Not matching email");
+                this.setState({validateEmail: "Gmu emails only: @gmu.edu or @masonlive.gmu.edu"});
+
+            }
+        },
+        // adding the user account into firebase
+        handleAdd: function (e) {
+            $.post("https://sheltered-journey-42475.herokuapp.com/singUp",{
+                FirstName: this.refs.fName.value,
+                LastName: this.refs.lName.value,
+                Email: this.refs.email.value,
+                Password: this.refs.password.value
+            });
+        },
+        //render function
+        render: function () {
+            return (
+                    <form className="creds">
+                        <table className="formTable">
+                            <tbody>
+                            <tr>
+                                <td>Email:</td>
+                                <td>
+                                    <input
+                                            className="input"
+                                            type="text"
+                                            id="email"
+                                            placeholder="GMU e-mail"
+                                            onChange={this.checkEmail}
+                                            ref="email"
+                                    />
+                                </td>
+                                <td>
+                                    <p id="validateEmail" ref="validateEmail"
+                                       style={{fontSize: '15px', color: 'red'}}>{this.state.validateEmail}</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Password:</td>
+                                <td>
+                                    <input className="input" type="password" id="password"
+                                           ref="password"
+                                           onChange={this.checkPwdLength}
+                                           placeholder="Password"/>
+                                </td>
+                                <td>
+                                    <p id="lengthPwd" ref="lengthPwd"
+                                       style={{fontSize: '15px', color: 'red'}}>{this.state.lengthPwd}</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Confirm Password:</td>
+                                <td>
+                                    <input className="input" type="password" id="password"
+                                           placeholder="Password"
+                                           onChange={this.checkPassword}
+                                           ref="confirmPwd"
+                                    />
+                                </td>
+                                <td>
+                                    <p id="matchPwd" ref="matchPwd"
+                                       style={{fontSize: '15px', color: 'red'}}>{this.state.matchPwd}</p>
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>First name:</td>
+                                <td>
+                                    <input className="input" ref="fName"
+                                           type="text" id="firstName" placeholder="First Name"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Last name:</td>
+                                <td>
+                                    <input className="input" ref="lName" type="text" id="lastName" placeholder="Last Name"/>
+                                </td>
+                            </tr>
+                            <tr>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <button className="tableButton button" id="signUpButton" onClick={this.handleAdd}>Sign Up</button>
+                    </form>
+            );
+        }
+    });
+
+
+    //POST A PRODUCT PAGE **********************************************************************************************
+    var ProductRegistration = React.createClass({
+        //http://stackoverflow.com/questions/29108779/how-to-get-selected-value-of-a-dropdown-menu-in-reactjs
+        getInitialState: function () {
+            return {
+                value: 'All'
+            };
+        },
+        mixins: [ReactFireMixin],
+        componentWillMount: function () {
+            if(userName) {
+                this.fireRef = firebase.database().ref('users').child(userName);
+            }
+        },
+        handleChange: function () {
+            this.props.onUserInput(
+                    this.setState({value: event.target.value}),
+                    this.refs.descriptionTextInput.value,
+                    this.refs.classTextInput.value,
+                    this.refs.professorTextInput.value,
+                    this.refs.priceTextInput.value,
+                    this.refs.isbnTextInput.value,
+                    this.refs.imageUploadInput.value
+            );
+        },
+        /*componentWillMount: function () {
+            this.firePostProduct = firebase.database().ref('products');
+        },*/
+        handleAdd: function (e) {
+            // setting up the firebase with all the necessary fields
+            var date = new Date().toJSON().slice(0, 10);
+            var categoryVal = this.refs.select.value;
+            var classNameVal =this.refs.classTextInput.value;
+            var descriptionVal = this.refs.descriptionTextInput.value;
+            var professorVal= this.refs.professorTextInput.value;
+            var priceVal = this.refs.priceTextInput.value;
+            var isbnVal = this.refs.isbnTextInput.value;
+            var imageVal = this.refs.imageUploadInput.value;
+
+            firebase.auth().currentUser.getToken().then(function(idToken) {
+                $.post("https://sheltered-journey-42475.herokuapp.com/postItem",{
+                    category: categoryVal,
+                    className: classNameVal,
+                    description: descriptionVal,
+                    professor: professorVal,
+                    price: priceVal,
+                    isbn: isbnVal,
+                    image: imageVal,
+                    postingDate: date,
+                    sellerid: "",
+                    token:idToken
+
+                });
+
+            });
+        },
+        handleUploadImg:function (e) {
+//            e.preventDefault();
+            console.log(  $("#postForm")[0]);
+            var formData = new FormData($("#postForm")[0]);
+
+            console.log(formData);
+//            var file = e.target.files[0];
+//           console.log(file);
+//
+//            var formData = new FormData();
+//            formData.append('file',  file);
+            $.ajax({
+                type: "POST",
+                url: "https://sheltered-journey-42475.herokuapp.com/upload",
+                data: formData,
+                processData: false,
+                contentType: false
+
+            });
+        },
+
+        render: function () {
+            return (
+                    <div>
+                        <form  className="creds">
+                            <table className="formTable">
+                                <tbody>
+                                <tr>
+                                    <td>Category:</td>
+                                    <td><select name="searchTermSelection" type="select" ref="select"
+                                                value={this.state.value}
+                                                onChange={this.handleChange}>
+                                        <option name="category" value="textbook">--select one--</option>
+                                        <option name="category" value="textbook">Textbook</option>
+                                        <option name="category" value="classNotes">Class Notes</option>
+                                        <option name="category" value="classMaterials">Class Materials</option>
+                                        <option name="category" value="misc">Miscellaneous</option>
+                                    </select>
+                                    </td>
+                                    <td>ISBN:</td>
+                                    <td><input
+                                            className="input"
+                                            type="text"
+                                            placeholder="ISBN"
+                                            value={this.props.isbnText}
+                                            ref="isbnTextInput"
+                                            onChange={this.handleChange}
+                                            id="productSubmissionISBN"
+                                    /></td>
+                                </tr>
+                                <tr>
+                                    <td>Item Description:</td>
+                                    <td><input
+                                            className="input"
+                                            type="text"
+                                            placeholder="Description"
+                                            value={this.props.descriptionText}
+                                            ref="descriptionTextInput"
+                                            onChange={this.handleChange}
+                                            id="productSubmissionDescription"
+                                    /></td>
+                                    <td>Class:</td>
+                                    <td><input
+                                            className="input"
+                                            type="text"
+                                            placeholder="Class"
+                                            value={this.props.classText}
+                                            ref="classTextInput"
+                                            onChange={this.handleChange}
+                                            id="productSubmissionClass"
+                                    /></td>
+                                </tr>
+                                <tr>
+                                    <td>Price:</td>
+                                    <td><input
+                                            className="input"
+                                            type="text"
+                                            placeholder="Price"
+                                            value={this.props.priceText}
+                                            ref="priceTextInput"
+                                            onChange={this.handleChange}
+                                            id="productSubmissionPrice"
+                                    /></td>
+                                    <td>Professor:</td>
+                                    <td><input
+                                            className="input"
+                                            type="text"
+                                            placeholder="Professor"
+                                            value={this.props.professorText}
+                                            ref="professorTextInput"
+                                            onChange={this.handleChange}
+                                            id="productSubmissionProfessor"
+                                    /></td>
+                                </tr>
+                                <tr>
+                                    <td>Image:</td>
+                                    <td>
+                                        <input
+                                                className="input"
+                                                type="file"
+                                                name="img"
+                                                value={this.props.imageUpload}
+                                                ref="imageUploadInput"
+                                                onChange={this.handleUploadImg}
+                                                id="productSubmissionFile"
+                                        />
+                                        <input type="button" ref="button" value="Upload" />
+
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <button className="tableButton button" id="signUpButton" onClick={this.handleAdd}>Submit
+                            </button>
+                        </form>
+                    </div>
+            );
+        }
+    });
+
+    var UserWelcome = React.createClass({
+        render: function () {
+            return (
+                    <div className="center">
+                        <h3>To post a product, please fill out the following form:</h3>
+                    </div>
+            );
+        }
+    });
+
+    var PostAProductPage = React.createClass({
+        getInitialState: function () {
+            return {
+                categorySelection: '--select one--',
+                descriptionText: '',
+                classText: '',
+                professorText: '',
+                priceText: '',
+                isbnText: '',
+                imageUpload: '',
+                date: ''
+            }
+        },
+        handleUserInput: function (categorySelection, descriptionText, classText, professorText, priceText, isbnText, imageUpload) {
+            this.setState({
+                categorySelection: categorySelection,
+                descriptionText: descriptionText,
+                classText: classText,
+                professorText: professorText,
+                priceText: priceText,
+                isbnText: isbnText,
+                imageUpload: imageUpload,
+            });
+        },
+        render: function () {
+            return (
+                    <div className="body pageContent">
+                        <UserWelcome
+                                user={this.props.user}
+                        />
+                        <ProductRegistration
+                                categorySelection={this.state.categorySelection}
+                                descriptionText={this.state.descriptionText}
+                                classText={this.state.classText}
+                                professorText={this.state.professorText}
+                                priceText={this.state.priceText}
+                                isbnText={this.state.isbnText}
+                                onUserInput={this.handleUserInput}
+                        />
+                    </div>
+            );
+        }
+    });
+
+    //SEARCH PAGE ******************************************************************************************************
+    //starting point: https://facebook.github.io/react/docs/thinking-in-react.html
+    var Results = React.createClass({
+        render: function () {
+            return (
+                    <tr>
+                        <td>{this.props.image}</td>
+                        <td>{this.props.description}</td>
+                        <td>{this.props.className}</td>
+                        <td>{this.props.professor}</td>
+                        <td>${this.props.price}</td>
+                        <td>{this.props.category}</td>
+                    </tr>
+            );
+        }
+    });
+
+    var NoResults = React.createClass({
+        render: function () {
+            return (
+                    <tr>
+                        <td colSpan="6">{this.props.description}</td>
+                    </tr>
+            );
+        }
+    });
+
+    var ActiveFilters = React.createClass({
+        render: function () {
+            return (
+                    <td>
+                        <div className="activeFilterItem">{this.props.name}: {this.props.value}</div>
+                    </td>
+            );
+        }
+    });
+
+    var SearchResultsTable = React.createClass({
+        render: function () {
+            var rows = [];
+            var itemsFound = 0;
+            var keyword = this.props.filterKeywordText;
+            var className = this.props.filterClassText;
+            var professor = this.props.filterProfessorText;
+            var price = parseInt(this.props.filterPriceMax);
+            //var date = this.props.filterDate;
+            this.props.items.forEach(function (item) {
+                var keywordRegex = new RegExp('');
+                var classNameRegex = new RegExp('');
+                var professorRegex = new RegExp('');
+                if (item.description != null) {
+                    keywordRegex = new RegExp('.*');
+                }
+                if (item.className != null) {
+                    classNameRegex = new RegExp('.*');
+                }
+                if (item.professor != null) {
+                    professorRegex = new RegExp('.*');
+                }
+                var keywordMatch = "";
+                var classNameMatch = "";
+                var professorMatch = "";
+                if (keyword.length > 0 && item.description != null) {
+                    keywordRegex = new RegExp('.*' + keyword.toLowerCase() + '.*');
+                }
+                if (item.description != null) {
+                    keywordMatch = keywordRegex.exec(item.description.toLowerCase());
+                }
+                if (className.length > 0 && item.className != null) {
+                    classNameRegex = new RegExp('.*' + className.toLowerCase() + '.*');
+                }
+                if (item.className != null) {
+                    classNameMatch = classNameRegex.exec(item.className.toLowerCase());
+                }
+                if (professor.length > 0 && item.professor != null) {
+                    professorRegex = new RegExp('.*' + professor.toLowerCase() + '.*');
+                }
+                if (item.professor != null) {
+                    professorMatch = professorRegex.exec(item.professor.toLowerCase());
+                }
+                if ((keywordMatch != null && keywordMatch.length > 0) &&
+                        (price > parseFloat(item.price) &&
+                                ( (item.category == "Miscellaneous" && className == '' && professor == '') ||
+                                ((classNameMatch != null && classNameMatch.length > 0) && professorMatch != null))
+                        )) {
+                    itemsFound++;
+                    rows.push(<Results image={item.image}
+                                       description={item.description}
+                                       className={item.className}
+                                       professor={item.professor}
+                                       price={item.price}
+                                       category={item.category}
+                                       key={item.id}/>);
+                }
+            }.bind(this));
+            if(itemsFound == 0){
+                rows.push(<NoResults description={"No results found"}
+                                     key={"empty"}/>);
+            }
+            return (
+                    <div className="search" data-list-size="4">
+                        <table className="searchResultTable">
+                            <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Description</th>
+                                <th>Class</th>
+                                <th>Professor</th>
+                                <th>Price</th>
+                                <th>Category</th>
+                            </tr>
+                            </thead>
+                            <tbody>{rows}</tbody>
+                        </table>
+                    </div>
+            );
+        }
+    });
+
+    var SearchBox = React.createClass({
+        handleChange: function () {
+            this.props.onUserInput(
+                    this.refs.filterKeywordTextInput.value,
+                    'all',
+                    this.refs.filterClassTextInput.value,
+                    this.refs.filterProfessorTextInput.value,
+                    this.refs.filterPriceMaxInput.value,
+            );
+        },
+        /*
+         //view-source:https://gmu-swe432.github.io/lecture10demos/public/06bonusreact/
+         removeItem: function(filter) {
+         console.log('remove: '+filter);
+         filter.active = false;
+         console.log(filter.active);
+         //filtersActive.removeItem(key);
+         },*/
+        render: function () {
+            //var _this = this; //view-source:https://gmu-swe432.github.io/lecture10demos/public/06bonusreact/
+            var filtersActive = [];
+            var filtersCurrent = [{name: 'Keyword', value: this.props.filterKeywordText, active: true},
+                {name: 'Class', value: this.props.filterClassText, active: true},
+                {name: 'Professor', value: this.props.filterProfessorText, active: true},
+                {name: 'Max Price', value: '$' + this.props.filterPriceMax, active: true}];
+            filtersCurrent.forEach(function (filter) {
+                if (filter.name == 'Max Price' || filter.name == 'Category' || (filter.active == true && filter.value != null && filter.value.length > 0)) {
+                    filtersActive.push(
+                            <ActiveFilters key={filter.name}
+                                           name={filter.name}
+                                           value={filter.value}
+                                           active={filter.active}
+                            />
+                    );
+                }
+            });
+            return (
+                    <div className="search" data-list-size="4">
+                        <table className="searchBoxTable">
+                            <tbody>
+                            <tr>
+                                <td><input
+                                        className="input"
+                                        type="text"
+                                        placeholder="Search by keyword"
+                                        value={this.props.filterKeywordText}
+                                        ref="filterKeywordTextInput"
+                                        onChange={this.handleChange}
+                                        id="searchBox"
+                                /></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div id="searchFilters">
+                            <table className="searchBoxTable">
+                                <thead>
+                                <tr>
+                                    <td>Class</td>
+                                    <td>Professor</td>
+                                    <td>Maximum Price</td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td><input
+                                            className="input"
+                                            type="text"
+                                            placeholder="Search term"
+                                            value={this.props.filterClassText}
+                                            ref="filterClassTextInput"
+                                            onChange={this.handleChange}
+                                            id="classSearchTermInput"
+                                    /></td>
+                                    <td><input
+                                            className="input"
+                                            type="text"
+                                            placeholder="Search term"
+                                            value={this.props.filterProfessorText}
+                                            ref="filterProfessorTextInput"
+                                            onChange={this.handleChange}
+                                            id="professorSearchTermInput"
+                                    /></td>
+                                    <td><input
+                                            className="input"
+                                            type="text"
+                                            placeholder="Enter maximum price"
+                                            id="priceSearchTermInput"
+                                            value={this.props.filterPriceMax}
+                                            ref="filterPriceMaxInput"
+                                            onChange={this.handleChange}
+                                    />
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <table>
+                                <tbody>
+                                <tr>
+                                    {filtersActive}
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+            );
+        }
+    });
+
+    var FilterableSearchPage = React.createClass({
+        getInitialState: function () {
+            var keyword = this.props.kw;
+            return {
+                filterKeywordText: keyword,
+                filterCategory: 'All',
+                filterClassText: '',
+                filterProfessorText: '',
+                filterPriceMax: '500',
+            }
+        },
+        handleUserInput: function (filterKeywordText, filterCategory, filterClassText, filterProfessorText, filterPriceMax) {
+            this.setState({
+                filterKeywordText: filterKeywordText,
+                filterCategory: filterCategory,
+                filterClassText: filterClassText,
+                filterProfessorText: filterProfessorText,
+                filterPriceMax: filterPriceMax,
+            });
+        },
+        render: function () {
+            return (
+                    <div>
+                        <SearchBox
+                                filterKeywordText={this.state.filterKeywordText}
+                                filterCategory={this.state.filterCategory}
+                                filterClassText={this.state.filterClassText}
+                                filterProfessorText={this.state.filterProfessorText}
+                                filterPriceMax={this.state.filterPriceMax}
+                                onUserInput={this.handleUserInput}
+                        />
+                        <SearchResultsTable
+                                items={this.props.items}
+                                filterKeywordText={this.state.filterKeywordText}
+                                filterCategory={this.state.filterCategory}
+                                filterClassText={this.state.filterClassText}
+                                filterProfessorText={this.state.filterProfessorText}
+                                filterPriceMax={this.state.filterPriceMax}
+                                onUserInput={this.handleUserInput}
+                        />
+                    </div>
+            );
+        }
+    });
+
+
+    //HOME PAGE ******************************************************************************************************
+
+    var HomePage = React.createClass({
+        render: function () {
+            return (
+                    <div className="bottomcolumns">
+                        <h1 className="features">Features</h1>
+                        <table>
+                            <tbody>
+                            <tr>
+                                <td><h3>Browse for items</h3>Are you looking for <b>class materials</b> like textbooks or
+                                    class notes? Are you looking for <b>miscellaneous items</b> like lamps or backpacks?
+                                    Browse your peers' listings to find what you're looking for, and filter by price,
+                                    class, professor, and more.
+                                </td>
+                                <td><h3>Post items</h3>Do you have something you would like to give away or sell? Whether
+                                    it's an old textbook, or a chair that you don't want to haul back home, list your items
+                                    and rest assured that only your GMU peers can contact you.
+                                </td>
+                                <td><h3>User connection</h3>Once a buyer has decided to purchase an item from
+                                    a listing, we connect the buyer to the seller and let the two parties decide payment
+                                    and logistical details.
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div id='dashboard'></div>
+                    </div>
+            );
+        }
+    });
+
+    //REUSED ITEMS
+    //last li element to be defined as username after successful login
+    var Menu = React.createClass({
+        handleChange: function () {
+            this.props.onUserInput(
+                    this.refs.menuSearchBoxFieldInput.value,
+            );
+        },
+        /*enter: function(event){
+         if(event.keyCode == 13){
+         this.updateSearchView();
+         }
+         },*/
+        updateHomeView: function () {
+            this.props.updateHomeView(
+                    "Home"
+            );
+        },
+        updateSearchView: function () {
+            this.props.updateSearchView(
+                    "Search"
+            );
+        },
+        updatePostView: function () {
+            this.props.updatePostView(
+                    "Post New Item"
+            );
+        },
+        updateLogInView: function () {
+            this.props.updateLogInView(
+                    "Log In"
+            );
+        },
+        updateSignUpView: function () {
+            this.props.updateSignUpView(
+                    "Sign Up"
+            );
+        },
+        /*
+         <li className="left" id="menuSearchBox">
+         <input type="text" placeholder="Search by keyword"
+         id="menuSearchBoxField"
+         onChange={this.handleChange}
+         onKeyDown={this.enter}
+         ref="menuSearchBoxFieldInput"/>
+         </li>
+         * */
+        render: function () {
+            return (
+                    <nav className="menu">
+                        <ul>
+                            <li className="left" id="homeLink" onClick={this.updateHomeView}>Home</li>
+                            <li className="left" id="postLink" onClick={this.updatePostView}>Post Item</li>
+
+                            <li className="left" id="searchLink" onClick={this.updateSearchView}>Search</li>
+                            <li className="rightMenuLinks" id="logInLink" onClick={this.updateLogInView}>Log In</li>
+                            <li className="rightMenuLinks">
+                                <div id="header">
+                                    <span id="sign-in-status" /> | <a href="javascript:firebase.auth().signOut()">Sign Out</a>
+                                </div>
+                            </li>
+                            <li className="rightMenuLinks" id="signUpLink" onClick={this.updateSignUpView}>Sign Up</li>
+                        </ul>
+                    </nav>
+            );
+        }
+    });
+
+    var Footer = React.createClass({
+        render: function () {
+            return (
+                    <footer className="footer">
+                        <h3>SWE 432</h3>
+                        <p>Dayana Hudson</p>
+                        <p>Ermal Dedej</p>
+                        <p><a href="https://github.com/dayanahudson/GMUExchange/">GitHub</a></p>
+
+                    </footer>
+            );
+        }
+    });
+
+    var SectionHeading = React.createClass({
+        render: function () {
+            return (
+                    <div className="sectionHeading">
+                        <h1 className="title">GMUExchange</h1>
+                        <h2 className="subtitle" id="subtitle">{this.props.subtitle}</h2>
+                        <img
+                                src="https://upload.wikimedia.org/wikipedia/commons/e/ea/An_aerial_view_of_the_Johnson_Center_at_dawn..jpg"/>
+                    </div>
+            );
+        }
+    });
+
+    var MainHeading = React.createClass({
+        render: function () {
+            return (
+                    <div className="mainHeading">
+                        <h1 className="title">GMUExchange</h1>
+                        <h2 className="subtitle">Peer to peer exchange for George Mason students</h2>
+                        <table className="quickLogin">
+                            <tbody>
+
+                            <tr>
+                                <th><input className="input" type="email" placeholder="GMU e-mail" id="quickLoginEmail"/>
+                                </th>
+                                <th><input className="input" type="password" placeholder="Password"
+                                           id="quickLoginPassword"/></th>
+                            </tr>
+                            <tr>
+                                <td colSpan="2">
+                                    <button className="button" id="quickLoginButton">Log In</button>
+                                </td>
+
+                            </tr>
+                            </tbody>
+                        </table>
+                        <img
+                                src="https://upload.wikimedia.org/wikipedia/commons/e/ea/An_aerial_view_of_the_Johnson_Center_at_dawn..jpg"/>
+                    </div>
+            );
+        }
+    });
+
+    //APP COMPONENT
+    var AppComponent = React.createClass({
+        getInitialState: function () {
+            return {
+                view: 'Home',
+                menuFilterKeywordText: ''
+            }
+        },
+        handleUserInput: function (menuFilterKeywordText) {
+            this.setState({
+                menuFilterKeywordText: menuFilterKeywordText,
+            });
+        },
+        updateCurrentView: function (view) {
+            this.setState({
+                view: view
+            });
+        },
+        render: function () {
+            if (this.state.view == 'Home') {
+                return (<div><Menu
+                        updateHomeView={this.updateCurrentView}
+                        updateSearchView={this.updateCurrentView}
+                        updatePostView={this.updateCurrentView}
+                        updateSignUpView={this.updateCurrentView}
+                        updateLogInView={this.updateCurrentView}
+                        onUserInput={this.handleUserInput}
+                /><MainHeading /><HomePage items={ITEMS}/><Footer /></div>);
+            }
+            else if (this.state.view == 'Search') {
+                return (<div><Menu
+                        updateHomeView={this.updateCurrentView}
+                        updateSearchView={this.updateCurrentView}
+                        updatePostView={this.updateCurrentView}
+                        updateSignUpView={this.updateCurrentView}
+                        updateLogInView={this.updateCurrentView}
+                        onUserInput={this.handleUserInput}
+                /><SectionHeading subtitle={this.state.view}/><FilterableSearchPage
+                        items={ITEMS}
+                        kw={this.state.menuFilterKeywordText}/><Footer /></div>);
+            }
+            else if (this.state.view == 'Post New Item') {
+                return (<div><Menu
+                        updateHomeView={this.updateCurrentView}
+                        updateSearchView={this.updateCurrentView}
+                        updatePostView={this.updateCurrentView}
+                        updateSignUpView={this.updateCurrentView}
+                        updateLogInView={this.updateCurrentView}
+                /><SectionHeading subtitle={this.state.view}/><PostAProductPage items={ITEMS}/><Footer /></div>);
+            }
+            else if (this.state.view == 'Sign Up') {
+                return (<div><Menu
+                        updateHomeView={this.updateCurrentView}
+                        updateSearchView={this.updateCurrentView}
+                        updatePostView={this.updateCurrentView}
+                        updateSignUpView={this.updateCurrentView}
+                        updateLogInView={this.updateCurrentView}
+                /><SectionHeading subtitle={this.state.view}/><SignUpPage items={ITEMS}/><Footer /></div>);
+            }
+            else if (this.state.view == 'Log In') {
+                return (<div><Menu
+                        updateHomeView={this.updateCurrentView}
+                        updateSearchView={this.updateCurrentView}
+                        updatePostView={this.updateCurrentView}
+                        updateSignUpView={this.updateCurrentView}
+                        updateLogInView={this.updateCurrentView}
+                /><SectionHeading subtitle={this.state.view}/><LogInPage items={ITEMS}/><Footer /></div>);
+            }
+        }
+    });
+
+    //DUMMY DATA
+    var ITEMS = [{
+        id: "1",
+        image: "IMAGE1.jpg",
+        isbn: "978-1305257795",
+        description: "Research Methods and Statistics - 5th edition",
+        price: "144.48",
+        category: "Textbook",
+        className: "GEN 301",
+        professor: "Johnson",
+        date: "01/02/2016"
+    },
+        {
+            id: "2",
+            image: "IMAGE2.jpg",
+            isbn: "978-1118345009",
+            description: "Principles of Anatomy and Physiology -Text Only - 14th edition",
+            price: "150.96",
+            category: "Textbook",
+            className: "PHYS 240",
+            professor: "Smith",
+            date: "05/02/2016"
+        },
+        {
+            id: "3",
+            image: "IMAGE3.jpg",
+            isbn: "978-1305632134",
+            description: "Power System Analysis and Design - 6th edition",
+            price: "148.49",
+            category: "Textbook",
+            className: "GEN 301",
+            professor: "Marks",
+            date: "07/02/2016"
+        },
+        {
+            id: "4",
+            image: "IMAGE4.jpg",
+            isbn: "978-0134201665",
+            description: "Anatomy and Physiology - With Mastering A and P - 6th edition",
+            price: "249.90",
+            category: "Textbook",
+            className: "PHYS 100",
+            professor: "Walker",
+            date: "08/02/2016"
+        },
+        {
+            id: "5",
+            image: "IMAGE5.jpg",
+            isbn: null,
+            description: "Class notes for GEN 202",
+            price: "10.00",
+            category: "Class Notes",
+            className: "GEN 301",
+            professor: "Johnson",
+            date: "01/02/2016"
+        },
+        {
+            id: "6",
+            image: "IMAGE6.jpg",
+            isbn: null,
+            description: "Class materials for ECE 301",
+            price: "25.00",
+            category: "Class Materials",
+            className: "ECE 301",
+            professor: "Johnson",
+            date: "01/02/2016"
+        },
+        {
+            id: "7",
+            image: "IMAGE7.jpg",
+            isbn: null,
+            description: "Desk and chair",
+            price: "40.00",
+            category: "Miscellaneous",
+            className: null,
+            professor: null,
+            date: "05/02/2016"
+        },];
+
+    //RENDER THE WHOLE PAGE
+    ReactDOM.render(
+            <AppComponent />,
+            document.getElementById('mountNode')
+    );
+
+</script>
+</body>
+</html>
