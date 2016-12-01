@@ -23,4 +23,4 @@ The four scenarios we decided on were as follows:
    (textbooks, class notes, class materials, miscellaneous) to view how many of each has been sold by month, or they can hover over the
    month to view the breakdown of posts by category.
 
-https://dayanahudson.github.io/GMUExchange/
+https://dayanahudson.github.io/GMUExchange/public/index.html
