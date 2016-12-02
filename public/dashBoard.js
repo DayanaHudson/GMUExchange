@@ -1,4 +1,3 @@
-$(document).ready(function () {
 
     var monthNames = ["Jan", "Feb", "March", "April", "May", "June",
         "July", "Aug", "Sep", "Oct", "Nov", "Dec"
@@ -257,6 +256,4 @@ $(document).ready(function () {
             pC = pieChart(tF), // create the pie-chart.
             leg= legend(tF);  // create the legend.
     }
-
     dashboard('#dashboard', freqData);
-});
