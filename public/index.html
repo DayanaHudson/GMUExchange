@@ -19,7 +19,7 @@
     <script type = "text/javascript" src = "https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
     <!--D3JS-->
     <script src="https://d3js.org/d3.v3.min.js"></script>
-    <script type="text/javascript" src="https://raw.github.com/dayanahudson/GMUExchange/master/public/dashBoard.js"></script>
+    <script src="dashBoard.js"></script>
     <link href="stylesheet.css" rel="stylesheet">
     <link href="search.css" rel="stylesheet">
     <link href="compatibility.css" rel="stylesheet">
@@ -792,12 +792,13 @@
 
 
     //HOME PAGE ******************************************************************************************************
-    $(window).bind("contentChanged",function() {
-        $.getScript( 'https://raw.github.com/dayanahudson/GMUExchange/master/public/dashBoard.js', function() {
+    /*$(window).bind("contentChanged",function() {
+        $.getScript( '/dashBoard.js', function() {
         });
-    });
+    });*/
     var HomePage = React.createClass({
         render: function () {
+            /*
             //prevent dashboard D3.JS graphics from being rendered multiple times when home page is clicked repeatedly,
             //or user is signed in when page is loaded, or user has to click "Log In" twice when signing in (thus
             //page renders twice automatically)
@@ -806,6 +807,7 @@
             }
             //All icons used are labeled for noncommercial reuse and were found through a Google searching limiting
             //results by this criterion.
+            */
             return (
                     <div className="pageContent">
                         <div className="bottomColumns">
