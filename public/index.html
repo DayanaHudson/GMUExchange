@@ -316,8 +316,8 @@
             );
         },
         /*componentWillMount: function () {
-            this.firePostProduct = firebase.database().ref('products');
-        },*/
+         this.firePostProduct = firebase.database().ref('products');
+         },*/
         handleAdd: function (e) {
             // setting up the firebase with all the necessary fields
             var date = new Date().toJSON().slice(0, 10);
@@ -523,7 +523,6 @@
         render: function () {
             return (
                     <tr>
-                        <td>{this.props.image}</td>
                         <td>{this.props.description}</td>
                         <td>{this.props.className}</td>
                         <td>{this.props.professor}</td>
@@ -621,7 +620,6 @@
                         <table className="searchResultTable">
                             <thead>
                             <tr>
-                                <th>Image</th>
                                 <th>Description</th>
                                 <th>Class</th>
                                 <th>Professor</th>
@@ -793,54 +791,54 @@
 
     //HOME PAGE ******************************************************************************************************
     /*$(window).bind("contentChanged",function() {
-        $.getScript( '/dashBoard.js', function() {
-        });
-    });*/
+     $.getScript( '/dashBoard.js', function() {
+     });
+     });*/
     var HomePage = React.createClass({
         render: function () {
             /*
-            //prevent dashboard D3.JS graphics from being rendered multiple times when home page is clicked repeatedly,
-            //or user is signed in when page is loaded, or user has to click "Log In" twice when signing in (thus
-            //page renders twice automatically)
-            if(this.props.prevView != 'Home' && !(this.props.prevView == null && userName != null)){
-                $(window).trigger("contentChanged");
-            }
-            //All icons used are labeled for noncommercial reuse and were found through a Google searching limiting
-            //results by this criterion.
-            */
+             //prevent dashboard D3.JS graphics from being rendered multiple times when home page is clicked repeatedly,
+             //or user is signed in when page is loaded, or user has to click "Log In" twice when signing in (thus
+             //page renders twice automatically)
+             if(this.props.prevView != 'Home' && !(this.props.prevView == null && userName != null)){
+             $(window).trigger("contentChanged");
+             }
+             //All icons used are labeled for noncommercial reuse and were found through a Google searching limiting
+             //results by this criterion.
+             */
             return (
                     <div className="pageContent">
                         <div className="bottomColumns">
-                        <table>
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Magnifying_glass_icon.svg/2000px-Magnifying_glass_icon.svg.png"/>
-                                </td>
-                                <td>
-                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Dollar_sign_in_circle.svg/1024px-Dollar_sign_in_circle.svg.png" />
-                                </td>
-                                <td>
-                                    <img src="http://image.flaticon.com/icons/png/256/20/20162.png"/>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><h3>Browse for items</h3>Are you looking for <b>class materials</b> like textbooks or
-                                    class notes? Are you looking for <b>miscellaneous items</b> like lamps or backpacks?
-                                    Browse your peers' listings to find what you're looking for, and filter by price,
-                                    class, professor, and more.
-                                </td>
-                                <td><h3>Post items</h3>Do you have something you would like to give away or sell? Whether
-                                    it's an old textbook, or a chair that you don't want to haul back home, list your items
-                                    after signing in and rest assured that only your GMU peers can contact you.
-                                </td>
-                                <td><h3>User connection</h3>Once a buyer has decided to purchase an item from
-                                    a listing, we connect the buyer to the seller and let the two parties decide payment
-                                    and logistical details.
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+                            <table>
+                                <tbody>
+                                <tr>
+                                    <td>
+                                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Magnifying_glass_icon.svg/2000px-Magnifying_glass_icon.svg.png"/>
+                                    </td>
+                                    <td>
+                                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Dollar_sign_in_circle.svg/1024px-Dollar_sign_in_circle.svg.png" />
+                                    </td>
+                                    <td>
+                                        <img src="http://image.flaticon.com/icons/png/256/20/20162.png"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><h3>Browse for items</h3>Are you looking for <b>class materials</b> like textbooks or
+                                        class notes? Are you looking for <b>miscellaneous items</b> like lamps or backpacks?
+                                        Browse your peers' listings to find what you're looking for, and filter by price,
+                                        class, professor, and more.
+                                    </td>
+                                    <td><h3>Post items</h3>Do you have something you would like to give away or sell? Whether
+                                        it's an old textbook, or a chair that you don't want to haul back home, list your items
+                                        after signing in and rest assured that only your GMU peers can contact you.
+                                    </td>
+                                    <td><h3>User connection</h3>Once a buyer has decided to purchase an item from
+                                        a listing, we connect the buyer to the seller and let the two parties decide payment
+                                        and logistical details.
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
                         </div>
                         <h3>Exchange Trends</h3>
                         <p>Hover over months or types of items exchanged below to see information about this year's
@@ -856,11 +854,11 @@
     //last li element to be defined as username after successful login
     var Menu = React.createClass({
         /*handleChange: function () {
-            this.props.onUserInput(
-                    this.refs.menuSearchBoxFieldInput.value,
-            );
-        },
-        enter: function(event){
+         this.props.onUserInput(
+         this.refs.menuSearchBoxFieldInput.value,
+         );
+         },
+         enter: function(event){
          if(event.keyCode == 13){
          this.updateSearchView();
          }
@@ -1012,8 +1010,8 @@
                         prevView={this.state.prevView}
                         prevPrevView={this.state.prevPrevView}
                 /><SectionHeading subtitle="Peer to peer exchange for George Mason students" /><HomePage items={ITEMS}
-                                           currView="Home"
-                                           prevView={this.state.prevView} prevPrevView={this.state.prevPrevView}/></div>);
+                                                                                                         currView="Home"
+                                                                                                         prevView={this.state.prevView} prevPrevView={this.state.prevPrevView}/></div>);
             }
             else if (this.state.view == 'Search') {
                 return (<div className="wrap"><Menu
