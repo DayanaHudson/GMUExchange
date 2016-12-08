@@ -42,25 +42,24 @@
     };
     firebase.initializeApp(config);
 
-    var userName = null;
+    var userName;
     // Initialize the FirebaseUI Widget using Firebase.
     var ui = new firebaseui.auth.AuthUI(firebase.auth());
+    var userC;
     firebase.auth().onAuthStateChanged(function(user) {
         if (user) {
+            console.log("Signed in");
 
             $("#firebaseui-auth-container").hide();
             $("#signUpLink").hide();
-            $("#statusViewName").show();
-            $("#statusViewSeparator").show();
-            $("#postLink").show();
-            $("#statusView").show();
-            $("#signInLink").hide();
-            $("#signOutLink").show();
+            $("#logInLink").hide();
             // User is signed in.
+            userC=user;
             var displayName = user.displayName;
             var email = user.email;
             var emailVerified = user.emailVerified;
             var photoURL = user.photoURL;
+            var uid = user.uid;
             userName = user.uid;
             ReactDOM.render(
                     <AppComponent />,
@@ -71,46 +70,46 @@
                 document.getElementById('sign-in-status').textContent = "Welcome, " + displayName;
             });
         } else {
+            console.log("Signed out");
             // User is signed out.
+            $("#header").hide();
             $("#signUpLink").show();
-            $("#statusViewName").hide();
-            $("#statusViewSeparator").hide();
-            $("#postLink").hide();
-            $("#statusView").hide();
             $("#firebaseui-auth-container").show();
-            $("#signInLink").show();
-            $("#signOutLink").hide();
-            userName = null;
+            $("#logInLink").show();
         }
     }, function(error) {
         console.log(error);
     });
 
-    var uiConfig = {
-        'signInSuccessUrl': '/', //URL that we get sent BACK to after logging in
-        'signInOptions': [
-            // Leave the lines as is for the providers you want to offer your users.
-            firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-//                    firebase.auth.FacebookAuthProvider.PROVIDER_ID,
-//                    firebase.auth.TwitterAuthProvider.PROVIDER_ID,
-//                    firebase.auth.GithubAuthProvider.PROVIDER_ID,
-//                    firebase.auth.EmailAuthProvider.PROVIDER_ID
-        ],
-        // Terms of service url.
-        'tosUrl': '<your-tos-url>',
-    };
     //LOG IN PAGE **********************************************************************************************
 
     var LogInPage = React.createClass({
         componentDidMount: function() {
+            console.log("We made the component!");
+            $("#header").hide();
+
+            var uiConfig = {
+                'signInSuccessUrl': '/', //URL that we get sent BACK to after logging in
+                'signInOptions': [
+                    // Leave the lines as is for the providers you want to offer your users.
+                    firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+//                    firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+//                    firebase.auth.TwitterAuthProvider.PROVIDER_ID,
+//                    firebase.auth.GithubAuthProvider.PROVIDER_ID,
+//                    firebase.auth.EmailAuthProvider.PROVIDER_ID
+                ],
+                // Terms of service url.
+                'tosUrl': '<your-tos-url>',
+            };
             ui.start('#firebaseui-auth-container', uiConfig);
+            $("#sign-in-status").show();
 
         },
         render: function () {
             return (
-                    <div className = "pageContent">
-                        <h3 className = "center">To sign in, please enter your information below</h3>
+                    <div>
                         <div id="firebaseui-auth-container"></div>
+
                         <form className="creds">
                             <table className="formTable">
                                 <tbody>
@@ -131,7 +130,7 @@
                                 </tbody>
 
                             </table>
-                            <div className="buttonHolder"><button className="tableButton button" id="signInButton">Sign In</button></div>
+                            <button className="tableButton button" id="signUpButton">Log In</button>
 
                         </form>
                     </div>
@@ -173,18 +172,30 @@
         // Checking if the user put the same password on both fields
         checkPassword: function (event) {
             if (this.refs.password.value !== this.refs.confirmPwd.value) {
-                this.setState({matchPwd: "Passwords must match"});
+                this.setState({matchPwd: "Passwords don't match"});
             } else {
                 this.setState({matchPwd: ""});
             }
         },
         //Checking for the length of password
         checkPwdLength:function (event) {
+            console.log(this.refs.password.length);
             var passlength= this.refs.password.value;
-            if(passlength.length < 8 || (passlength.search(/[a-z]/i) < 0 || passlength.search(/[A-Z]/i) < 0) ||
-                    passlength.search(/[0-9]/) < 0 || passlength.search(/[#?!@$%^&*-]/)<0){
-                this.setState({lengthPwd: "Your password must be at least 8 characters long, contain at least 1 letter," +
-                "1 digit, and 1 special character such as #?!@$%^&*-."});
+            if(passlength.length < 8){
+                this.setState({lengthPwd: "Your password must be at least 8 characters"});
+            }
+            else if(passlength.search(/[a-z]/i) < 0) {// check for lower case letters
+                this.setState({lengthPwd:"Your password must contain at least one letter."});
+            }
+            else if (passlength.search(/[0-9]/) < 0) {// checks for digits
+                this.setState({lengthPwd:"Your password must contain at least one digit."});
+            }
+            else if (passlength.search(/[A-Z]/) < 0) {// check for upper case letters
+                this.setState({lengthPwd:"Your password must contain at least one upper case letter."});
+            }
+            else if(passlength.search(/[#?!@$%^&*-]/)<0){ // checks for specials charceter
+                this.setState({lengthPwd:"Your password must contain at least one specail character #?!@$%^&*-."});
+
             }
             else{
                 this.setState({lengthPwd: "Valid Password"});
@@ -217,8 +228,7 @@
         //render function
         render: function () {
             return (
-                    <form className="creds pageContent">
-                        <h3 className = "center">To sign up, please enter your information below</h3>
+                    <form className="creds">
                         <table className="formTable">
                             <tbody>
                             <tr>
@@ -283,7 +293,7 @@
                             </tr>
                             </tbody>
                         </table>
-                        <div className="buttonHolder"><button className="tableButton button" id="signUpButton" onClick={this.handleAdd}>Sign Up</button></div>
+                        <button className="tableButton button" id="signUpButton" onClick={this.handleAdd}>Sign Up</button>
                     </form>
             );
         }
@@ -369,7 +379,7 @@
 
         render: function () {
             return (
-                    <div className = "pageContent">
+                    <div>
                         <form  className="creds">
                             <table className="formTable">
                                 <tbody>
@@ -458,7 +468,8 @@
                                 </tr>
                                 </tbody>
                             </table>
-                            <div className="buttonHolder"><button className="tableButton button" id="signUpButton" onClick={this.handleAdd}>Submit</button></div>
+                            <button className="tableButton button" id="signUpButton" onClick={this.handleAdd}>Submit
+                            </button>
                         </form>
                     </div>
             );
@@ -468,7 +479,9 @@
     var UserWelcome = React.createClass({
         render: function () {
             return (
-                    <h3 className="center">To post a product, please fill out the following form</h3>
+                    <div className="center">
+                        <h3>To post a product, please fill out the following form:</h3>
+                    </div>
             );
         }
     });
@@ -617,7 +630,7 @@
                                      key={"empty"}/>);
             }
             return (
-                    <div className="search" data-list-size="4" >
+                    <div className="search" data-list-size="4">
                         <table className="searchResultTable">
                             <thead>
                             <tr>
@@ -746,7 +759,7 @@
 
     var FilterableSearchPage = React.createClass({
         getInitialState: function () {
-            var keyword = '';
+            var keyword = this.props.kw;
             return {
                 filterKeywordText: keyword,
                 filterCategory: 'All',
@@ -766,8 +779,7 @@
         },
         render: function () {
             return (
-                    <div className="pageContent">
-                        <h3 className = "center">To search, please enter your query below</h3>
+                    <div>
                         <SearchBox
                                 filterKeywordText={this.state.filterKeywordText}
                                 filterCategory={this.state.filterCategory}
@@ -792,38 +804,14 @@
 
 
     //HOME PAGE ******************************************************************************************************
-    /*$(window).bind("contentChanged",function() {
-        $.getScript( '/dashBoard.js', function() {
-        });
-    });*/
+
     var HomePage = React.createClass({
         render: function () {
-            /*
-            //prevent dashboard D3.JS graphics from being rendered multiple times when home page is clicked repeatedly,
-            //or user is signed in when page is loaded, or user has to click "Log In" twice when signing in (thus
-            //page renders twice automatically)
-            if(this.props.prevView != 'Home' && !(this.props.prevView == null && userName != null)){
-                $(window).trigger("contentChanged");
-            }
-            //All icons used are labeled for noncommercial reuse and were found through a Google searching limiting
-            //results by this criterion.
-            */
             return (
-                    <div className="pageContent">
-                        <div className="bottomColumns">
+                    <div className="bottomcolumns">
+                        <h1 className="features">Features</h1>
                         <table>
                             <tbody>
-                            <tr>
-                                <td>
-                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Magnifying_glass_icon.svg/2000px-Magnifying_glass_icon.svg.png"/>
-                                </td>
-                                <td>
-                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Dollar_sign_in_circle.svg/1024px-Dollar_sign_in_circle.svg.png" />
-                                </td>
-                                <td>
-                                    <img src="http://image.flaticon.com/icons/png/256/20/20162.png"/>
-                                </td>
-                            </tr>
                             <tr>
                                 <td><h3>Browse for items</h3>Are you looking for <b>class materials</b> like textbooks or
                                     class notes? Are you looking for <b>miscellaneous items</b> like lamps or backpacks?
@@ -832,7 +820,7 @@
                                 </td>
                                 <td><h3>Post items</h3>Do you have something you would like to give away or sell? Whether
                                     it's an old textbook, or a chair that you don't want to haul back home, list your items
-                                    after siging in and rest assured that only your GMU peers can contact you.
+                                    and rest assured that only your GMU peers can contact you.
                                 </td>
                                 <td><h3>User connection</h3>Once a buyer has decided to purchase an item from
                                     a listing, we connect the buyer to the seller and let the two parties decide payment
@@ -841,12 +829,7 @@
                             </tr>
                             </tbody>
                         </table>
-                        </div>
-                        <h3>Exchange Trends</h3>
-                        <p>Hover over months or types of items exchanged below to see information about this year's
-                            exchanges.</p>
-                        <br/>
-                        <div id='dashboard' className="center"></div>
+                        <div id='dashboard'></div>
                     </div>
             );
         }
@@ -855,49 +838,39 @@
     //REUSED ITEMS
     //last li element to be defined as username after successful login
     var Menu = React.createClass({
-        /*handleChange: function () {
+        handleChange: function () {
             this.props.onUserInput(
                     this.refs.menuSearchBoxFieldInput.value,
             );
         },
-        enter: function(event){
+        /*enter: function(event){
          if(event.keyCode == 13){
          this.updateSearchView();
          }
          },*/
         updateHomeView: function () {
             this.props.updateHomeView(
-                    "Home",
-                    this.props.currView,
-                    this.props.prevView
+                    "Home"
             );
         },
         updateSearchView: function () {
             this.props.updateSearchView(
-                    "Search",
-                    this.props.currView,
-                    this.props.prevView
+                    "Search"
             );
         },
         updatePostView: function () {
             this.props.updatePostView(
-                    "Post New Item",
-                    this.props.currView,
-                    this.props.prevView
+                    "Post New Item"
             );
         },
         updateLogInView: function () {
             this.props.updateLogInView(
-                    "Sign In",
-                    this.props.currView,
-                    this.props.prevView
+                    "Log In"
             );
         },
         updateSignUpView: function () {
             this.props.updateSignUpView(
-                    "Sign Up",
-                    this.props.currView,
-                    this.props.prevView
+                    "Sign Up"
             );
         },
         /*
@@ -917,15 +890,11 @@
                             <li className="left" id="postLink" onClick={this.updatePostView}>Post Item</li>
 
                             <li className="left" id="searchLink" onClick={this.updateSearchView}>Search</li>
-                            <li className="rightMenuLinks" id="signInLink" onClick={this.updateLogInView}>Sign In</li>
-                            <li className="rightMenuLinks" id="signOutLink">
-                                <a href="javascript:firebase.auth().signOut()">Sign Out</a>
-                            </li>
-                            <li className="rightMenuLinks statusBoxes" id="statusViewSeparator">
-                                |
-                            </li>
-                            <li className="rightMenuLinks statusBoxes" id="statusViewName">
-                                <span id="sign-in-status" />
+                            <li className="rightMenuLinks" id="logInLink" onClick={this.updateLogInView}>Log In</li>
+                            <li className="rightMenuLinks">
+                                <div id="header">
+                                    <span id="sign-in-status" /> | <a href="javascript:firebase.auth().signOut()">Sign Out</a>
+                                </div>
                             </li>
                             <li className="rightMenuLinks" id="signUpLink" onClick={this.updateSignUpView}>Sign Up</li>
                         </ul>
@@ -934,16 +903,24 @@
         }
     });
 
+    var Footer = React.createClass({
+        render: function () {
+            return (
+                    <footer className="footer">
+                        <h3>SWE 432</h3>
+                        <p>Dayana Hudson</p>
+                        <p>Ermal Dedej</p>
+                        <p><a href="https://github.com/dayanahudson/GMUExchange/">GitHub</a></p>
+
+                    </footer>
+            );
+        }
+    });
 
     var SectionHeading = React.createClass({
-        componentDidMount: function() {
-            ui.start('#firebaseuiAuthContainer', uiConfig);
-
-        },
         render: function () {
             return (
                     <div className="sectionHeading">
-                        <div id="firebaseuiAuthContainer"/>
                         <h1 className="title">GMUExchange</h1>
                         <h2 className="subtitle" id="subtitle">{this.props.subtitle}</h2>
                         <img
@@ -953,13 +930,12 @@
         }
     });
 
-
     var MainHeading = React.createClass({
         render: function () {
             return (
                     <div className="mainHeading">
                         <h1 className="title">GMUExchange</h1>
-                        <h2 className="subtitle">A peer to peer marketplace for George Mason students</h2>
+                        <h2 className="subtitle">Peer to peer exchange for George Mason students</h2>
                         <table className="quickLogin">
                             <tbody>
 
@@ -971,7 +947,7 @@
                             </tr>
                             <tr>
                                 <td colSpan="2">
-                                    <button className="button" id="quickLoginButton">Sign In</button>
+                                    <button className="button" id="quickLoginButton">Log In</button>
                                 </td>
 
                             </tr>
@@ -989,96 +965,71 @@
         getInitialState: function () {
             return {
                 view: 'Home',
-                prevView: null,
-                prevPrevView: null
+                menuFilterKeywordText: ''
             }
         },
-        updateCurrentView: function (view,prevView,prevPrevView) {
+        handleUserInput: function (menuFilterKeywordText) {
             this.setState({
-                view: view,
-                prevView: prevView,
-                prevPrevView: prevPrevView
+                menuFilterKeywordText: menuFilterKeywordText,
+            });
+        },
+        updateCurrentView: function (view) {
+            this.setState({
+                view: view
             });
         },
         render: function () {
             if (this.state.view == 'Home') {
-                return (<div className="wrap"><Menu
+                return (<div><Menu
                         updateHomeView={this.updateCurrentView}
                         updateSearchView={this.updateCurrentView}
                         updatePostView={this.updateCurrentView}
                         updateSignUpView={this.updateCurrentView}
                         updateLogInView={this.updateCurrentView}
-                        currView="Home"
-                        prevView={this.state.prevView}
-                        prevPrevView={this.state.prevPrevView}
-                /><SectionHeading subtitle="Peer to peer exchange for George Mason students" /><HomePage items={ITEMS}
-                                           currView="Home"
-                                           prevView={this.state.prevView} prevPrevView={this.state.prevPrevView}/></div>);
+                        onUserInput={this.handleUserInput}
+                /><MainHeading /><HomePage items={ITEMS}/><Footer /></div>);
             }
             else if (this.state.view == 'Search') {
-                return (<div className="wrap"><Menu
+                return (<div><Menu
                         updateHomeView={this.updateCurrentView}
                         updateSearchView={this.updateCurrentView}
                         updatePostView={this.updateCurrentView}
                         updateSignUpView={this.updateCurrentView}
                         updateLogInView={this.updateCurrentView}
-                        currView="Search"
-                        prevView={this.state.prevView}
-                        prevPrevView={this.state.prevPrevView}
+                        onUserInput={this.handleUserInput}
                 /><SectionHeading subtitle={this.state.view}/><FilterableSearchPage
                         items={ITEMS}
-                        currView="Search"
-                        prevView={this.state.prevView}
-                        prevPrevView={this.state.prevPrevView}/></div>);
+                        kw={this.state.menuFilterKeywordText}/><Footer /></div>);
             }
             else if (this.state.view == 'Post New Item') {
-                return (<div className="wrap"><Menu
+                return (<div><Menu
                         updateHomeView={this.updateCurrentView}
                         updateSearchView={this.updateCurrentView}
                         updatePostView={this.updateCurrentView}
                         updateSignUpView={this.updateCurrentView}
                         updateLogInView={this.updateCurrentView}
-                        currView="Post New Item"
-                        prevView={this.state.prevView}
-                        prevPrevView={this.state.prevPrevView}
-                /><SectionHeading subtitle={this.state.view}/><PostAProductPage items={ITEMS}
-                                                                                currView="Post New Item"
-                                                                                prevView={this.state.prevView}
-                                                                                prevPrevView={this.state.prevPrevView}/></div>);
+                /><SectionHeading subtitle={this.state.view}/><PostAProductPage items={ITEMS}/><Footer /></div>);
             }
             else if (this.state.view == 'Sign Up') {
-                return (<div className="wrap"><Menu
+                return (<div><Menu
                         updateHomeView={this.updateCurrentView}
                         updateSearchView={this.updateCurrentView}
                         updatePostView={this.updateCurrentView}
                         updateSignUpView={this.updateCurrentView}
                         updateLogInView={this.updateCurrentView}
-                        currView="Sign Up"
-                        prevView={this.state.prevView}
-                        prevPrevView={this.state.prevPrevView}
-                /><SectionHeading subtitle={this.state.view}/><SignUpPage items={ITEMS}
-                                                                          currView="Sign Up"
-                                                                          prevView={this.state.prevView}
-                                                                          prevPrevView={this.state.prevPrevView}/></div>);
+                /><SectionHeading subtitle={this.state.view}/><SignUpPage items={ITEMS}/><Footer /></div>);
             }
-            else if (this.state.view == 'Sign In') {
-                return (<div className="wrap"><Menu
+            else if (this.state.view == 'Log In') {
+                return (<div><Menu
                         updateHomeView={this.updateCurrentView}
                         updateSearchView={this.updateCurrentView}
                         updatePostView={this.updateCurrentView}
                         updateSignUpView={this.updateCurrentView}
                         updateLogInView={this.updateCurrentView}
-                        currView="Sign In"
-                        prevView={this.state.prevView}
-                        prevPrevView={this.state.prevPrevView}
-                /><SectionHeading subtitle={this.state.view}/><LogInPage items={ITEMS}
-                                                                         currView="Sign In"
-                                                                         prevView={this.state.prevView}
-                                                                         prevPrevView={this.state.prevPrevView}/></div>);
+                /><SectionHeading subtitle={this.state.view}/><LogInPage items={ITEMS}/><Footer /></div>);
             }
         }
     });
-
 
     //DUMMY DATA
     var ITEMS = [{
@@ -1167,11 +1118,4 @@
 
 </script>
 </body>
-<footer class="footer">
-    <h3>SWE 432</h3>
-    <p>Dayana Hudson</p>
-    <p>Ermal Dedej</p>
-    <p><a href="https://github.com/dayanahudson/GMUExchange/">GitHub</a></p>
-
-</footer>
 </html>
