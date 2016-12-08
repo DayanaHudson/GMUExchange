@@ -1,4 +1,4 @@
-
+$(document).ready(function () {
     var monthNames = ["Jan", "Feb", "March", "April", "May", "June",
         "July", "Aug", "Sep", "Oct", "Nov", "Dec"
     ];
@@ -257,3 +257,4 @@
             leg= legend(tF);  // create the legend.
     }
     dashboard('#dashboard', freqData);
+});
