@@ -66,18 +66,12 @@
         display: table-cell;
         text-align: center;
     }
-    #menuSearchBox{
-        width: 525px;
-    }
 }
 /*COMPUTER: FULL SCREEN*/
 @media screen and (min-width: 1400px) { /*http://www.w3schools.com/cssref/css3_pr_mediaquery.asp*/
     .mainHeading .title {
-        top: 0%;
+        top: 0;
         font-size: 60px;
-    }
-    #menuSearchBox{
-        width: 1550px;
     }
     .mainHeading .table, .quickLogin{
         padding-left: 35%;
@@ -87,7 +81,7 @@
         top: 20%;
         font-size: 40px;
     }
-    .bottomColumns, .searchResultTable {
+    .searchResultTable {
         min-height: 290px;
     }
 }
