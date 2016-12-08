@@ -47,7 +47,6 @@
     var ui = new firebaseui.auth.AuthUI(firebase.auth());
     firebase.auth().onAuthStateChanged(function(user) {
         if (user) {
-            console.log("Signed in");
 
             $("#firebaseui-auth-container").hide();
             $("#signUpLink").hide();
@@ -72,7 +71,6 @@
                 document.getElementById('sign-in-status').textContent = "Welcome, " + displayName;
             });
         } else {
-            console.log("Signed out");
             // User is signed out.
             $("#signUpLink").show();
             $("#statusViewName").hide();
@@ -133,7 +131,7 @@
                                 </tbody>
 
                             </table>
-                            <div className="buttonHolder"><button className="tableButton button" id="signUpButton">Sign In</button></div>
+                            <div className="buttonHolder"><button className="tableButton button" id="signInButton">Sign In</button></div>
 
                         </form>
                     </div>
@@ -182,7 +180,6 @@
         },
         //Checking for the length of password
         checkPwdLength:function (event) {
-            console.log(this.refs.password.length);
             var passlength= this.refs.password.value;
             if(passlength.length < 8 || (passlength.search(/[a-z]/i) < 0 || passlength.search(/[A-Z]/i) < 0) ||
                     passlength.search(/[0-9]/) < 0 || passlength.search(/[#?!@$%^&*-]/)<0){
@@ -801,18 +798,30 @@
     });
     var HomePage = React.createClass({
         render: function () {
-            console.log('HOME PAGE PREV VIEW: '+this.props.prevView);
             //prevent dashboard D3.JS graphics from being rendered multiple times when home page is clicked repeatedly,
             //or user is signed in when page is loaded, or user has to click "Log In" twice when signing in (thus
             //page renders twice automatically)
             if(this.props.prevView != 'Home' && !(this.props.prevView == null && userName != null)){
                 $(window).trigger("contentChanged");
             }
+            //All icons used are labeled for noncommercial reuse and were found through a Google searching limiting
+            //results by this criterion.
             return (
                     <div className="pageContent">
-                        <h1 className="bottoncolumns features">Features</h1>
+                        <div className="bottomColumns">
                         <table>
                             <tbody>
+                            <tr>
+                                <td>
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Magnifying_glass_icon.svg/2000px-Magnifying_glass_icon.svg.png"/>
+                                </td>
+                                <td>
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Dollar_sign_in_circle.svg/1024px-Dollar_sign_in_circle.svg.png" />
+                                </td>
+                                <td>
+                                    <img src="http://image.flaticon.com/icons/png/256/20/20162.png"/>
+                                </td>
+                            </tr>
                             <tr>
                                 <td><h3>Browse for items</h3>Are you looking for <b>class materials</b> like textbooks or
                                     class notes? Are you looking for <b>miscellaneous items</b> like lamps or backpacks?
@@ -821,7 +830,7 @@
                                 </td>
                                 <td><h3>Post items</h3>Do you have something you would like to give away or sell? Whether
                                     it's an old textbook, or a chair that you don't want to haul back home, list your items
-                                    and rest assured that only your GMU peers can contact you.
+                                    after siging in and rest assured that only your GMU peers can contact you.
                                 </td>
                                 <td><h3>User connection</h3>Once a buyer has decided to purchase an item from
                                     a listing, we connect the buyer to the seller and let the two parties decide payment
@@ -830,9 +839,11 @@
                             </tr>
                             </tbody>
                         </table>
+                        </div>
                         <h3>Exchange Trends</h3>
                         <p>Hover over months or types of items exchanged below to see information about this year's
                             exchanges.</p>
+                        <br/>
                         <div id='dashboard' className="center"></div>
                     </div>
             );
@@ -940,12 +951,13 @@
         }
     });
 
+
     var MainHeading = React.createClass({
         render: function () {
             return (
                     <div className="mainHeading">
                         <h1 className="title">GMUExchange</h1>
-                        <h2 className="subtitle">Peer to peer exchange for George Mason students</h2>
+                        <h2 className="subtitle">A peer to peer marketplace for George Mason students</h2>
                         <table className="quickLogin">
                             <tbody>
 
@@ -985,9 +997,6 @@
                 prevView: prevView,
                 prevPrevView: prevPrevView
             });
-            console.log('view: '+view);
-            console.log('prevView: '+prevView);
-            console.log('prevPrevView: '+prevPrevView);
         },
         render: function () {
             if (this.state.view == 'Home') {
@@ -1067,6 +1076,7 @@
             }
         }
     });
+
 
     //DUMMY DATA
     var ITEMS = [{
