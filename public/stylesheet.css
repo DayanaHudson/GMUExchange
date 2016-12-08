@@ -6,17 +6,16 @@ p, h1, h2, h3, h4, h5, h6, li, .bottomColumns, .creds, .search, .body {
     font-family: sans-serif;
 }
 a {
-    color:inherit;
-    text-decoration:none;
+    color: inherit;
+    text-decoration: none;
 }
-html {
-    min-height:100%;
+html{
+    height: 100%;
 }
 body {
     background-color: #f2f2f2;
-}
-content {
-    min-height: 100%;
+    height: 100%;
+    margin: 0;
 }
 input[type="password"], input[type="email"]{
     font-size: 17px;
@@ -26,14 +25,17 @@ input[type="text"]{
     font-size: 17px;
     width: 100%;
 }
-.features {
-    text-align: center;
-}
 
 .pageContent {
-    padding: 15px;
+    margin: 20px;
+    overflow: visible;
 }
-
+.pageContent h1 {
+    text-align: center;
+}
+.wrap{
+    min-height: 720px;
+}
 .center {
     text-align: center;
 }
@@ -50,43 +52,41 @@ input[type="text"]{
 
 .creds{
     position: relative;
-    padding: 15px;
     display: block;
-    width: 90%;
     text-align: left;
+    width: auto;
 }
 
 /*Menu styling*/
 .menu {
+    padding: 1px;
     margin-top: -10px;
     height: 60px;
-    padding: 1px;
     background-color: green;
     opacity: 0.9;
 }
 .menu li {
     display: inline-block;
     padding: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
     color: white;
     float: right;
-}
-li.left {
-    float: left;
-}
-
-/*Log out styling*/
-#logOut{
-    display: inline-block;
-    visibility: hidden;
-    padding: 10px;
-    color: white;
-}
-#logOut:hover{
-    color: green;
+    text-align: right;
 }
 .menu li:hover {
     background-color: white;
     color: green;
+    cursor: pointer;
+}
+li.left {
+    float: left;
+    text-align: left;
+}
+.menu li.statusBoxes {
+    background-color: green;
+    color: white;
+    cursor: default;
 }
 
 /*Main and Section heading styling*/
@@ -99,14 +99,13 @@ li.left {
     width: 100%;
     max-height: 100%;
     opacity: 0.45;
-    transition: 1s ease-in;
 }
-/*Main heading and Section heading image transformation*/
+/*Main heading and Section heading image transformation
 .mainHeading img:hover, .sectionHeading img:hover {
     transform: scale(1.1);
-}
+}*/
 
-/*originally implemented for new item to be posted*/
+/*originally implemented for new item to be posted
 .newItem {
     display: none;
 }
@@ -114,7 +113,7 @@ li.left {
 .newItemForm {
     width: 50%;
     padding: 10px;
-}
+}*/
 
 /*Title, Subtitle, and Home Page login styling*/
 .title, .subtitle, .quickLogin{
@@ -140,8 +139,8 @@ li.left {
     border: none;
     font-size: 20px;
 }
-.creds .button {
-    margin: auto 50%;
+.buttonHolder{
+    text-align: center;
 }
 
 .tableButton {
@@ -157,15 +156,15 @@ li.left {
 /*Home Page - Bottom columns*/
 .bottomColumns {
     width: 100%;
+    padding-top: 10px;
+    padding-bottom: 20px;
     background-color: #f2f2f2;
-    padding-bottom: 15px;
     color: #333333;
-    padding-top: 5px;
 }
-.bottomColumns .table, .bottomColumns .table .td{
-    padding-bottom: 15px;
-    padding-right: 15px;
-    padding-left: 15px;
+
+.bottomColumns img {
+    width: 40px;
+    height: 40px;
 }
 
 /*Footer styling*/
@@ -181,7 +180,9 @@ li.left {
     font-family: monospace;
     font-size: 20px;
 }
-
+#firebaseuiAuthContainer{
+    display: none;
+}
 .firebaseui-idp-button {
     direction: ltr;
     font-weight: 500;
